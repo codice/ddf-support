@@ -46,9 +46,9 @@
     </properties>
     
     <scm>
-        <url>https://github.com/codice/ddf.git</url>
-        <connection>scm:git:git://github.com/codice/ddf.git</connection>
-        <developerConnection>scm:git:git://github.com/codice/ddf.git</developerConnection>
+        <url>https://github.com/codice/ddf-support.git</url>
+        <connection>scm:git:git://github.com/codice/ddf-support.git</connection>
+        <developerConnection>scm:git:git://github.com/codice/ddf-support.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
 
