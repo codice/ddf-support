@@ -12,7 +12,7 @@
 -->
 <img src="https://tools.codice.org/wiki/download/attachments/3047458/ddf.jpg"/>
 # [Distributed Data Framework Support \(DDF-Support\)](http://ddf.codice.org/)
-[![Build Status](https://travis-ci.org/codice/ddf.png)](https://travis-ci.org/codice/ddf-support?branch=master)
+[![Build Status](https://travis-ci.org/codice/ddf-support.png?branch=master)](https://travis-ci.org/codice/ddf-support)
 
 
 DDF-Support is an open source project integrated with the DDF integration framework. 
