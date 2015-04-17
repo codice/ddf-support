@@ -29,6 +29,7 @@
 
     <modules>
         <module>support-checkstyle</module>
+        <module>DDF Support Code Coverage</module>
     </modules>
     
     <properties>
