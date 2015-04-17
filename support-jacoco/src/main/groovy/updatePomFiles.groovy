@@ -1,3 +1,17 @@
+/**
+ * Copyright (c) Codice Foundation
+ *
+ * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
+ * General Public License as published by the Free Software Foundation, either version 3 of the
+ * License, or any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+ * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details. A copy of the GNU Lesser General Public License
+ * is distributed along with this program and can be found at
+ * <http://www.gnu.org/licenses/lgpl.html>.
+ *
+ **/
 package org.codice.ddf.support
 
 import org.apache.maven.shared.invoker.DefaultInvocationRequest
@@ -6,6 +20,18 @@ import org.apache.maven.shared.invoker.InvocationOutputHandler
 
 import java.text.DecimalFormat
 
+/*
+ * This Groovy script is used to add JaCoCo () code coverage tool configuration to one or more pom.xml files.
+ *
+ * To use the tool, execute the following Maven command from the support-jacoco directory:
+ *   > mvn groovy:execute -DprojectsRoot=<Maven project root directory>
+ *
+ * An optional -Ddebug argument can be provided to turn on debug information.
+ */
+
+/**
+ * Script global variables and constants
+ */
 class Globals {
     static boolean debug = false;
 
@@ -82,6 +108,10 @@ class Globals {
         """
 }
 
+/**
+ * Class used to capture the output of the maven command and extract the different code coverage values that will be
+ * used to generated the JaCoCo configuration.
+ */
 class OutputHandler implements InvocationOutputHandler {
     private final Map<String, String> ratios = new HashMap<String, String>()
 
@@ -111,8 +141,18 @@ class OutputHandler implements InvocationOutputHandler {
     }
 }
 
+/**
+ * Main class used to update the pom files with the proper JaCoCo configuration.
+ */
 class JaCoCoPomUpdater {
 
+    /**
+     * Recursively processes all the pom.xml files found under the root directory provided. This method will
+     * automatically skip the pom.xml files that already contain a JaCoCo configuration element. The files that don't
+     * will be updated with the proper JaCoCo code coverage values.
+     *
+     * @param projectsRoot root direction to process
+     */
     public void process(String projectsRoot) {
         println "Processing Maven projects in ${projectsRoot}"
 
@@ -206,6 +246,10 @@ class JaCoCoPomUpdater {
         xmlPrinter.print(pom)
     }
 }
+
+/*
+ * Script main function
+ */
 
 def usage = "Usage: mvn groovy:execute -DprojectsRoot=<maven project root directory> [-Ddebug]"
 def projectsRoot = System.getProperty("projectsRoot")

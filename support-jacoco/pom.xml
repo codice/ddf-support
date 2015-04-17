@@ -13,84 +13,20 @@
 
     <build>
         <plugins>
-            <!--
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <executions>
-                    <execution>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <mainClass>org.jruby.Main</mainClass>
-                    <arguments>
-                        <argument>${basedir}/src/main/ruby/update-jacoco-coverage.rb</argument>
-                    </arguments>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-invoker-plugin</artifactId>
-                <version>1.10</version>
-                <configuration>
-                    <debug>true</debug>
-                    <projectsDirectory>
-                        /Users/elessard/Documents/dib/dib-interoperability/common/interoperability-dibcommons
-                    </projectsDirectory>
-                    <postBuildHookScript>${basedir}/src/main/groovy/updatePomFiles.groovyles.groovy</postBuildHookScript>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>integration-updatePomFiles</id>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
             <plugin>
                 <groupId>org.codehaus.gmaven</groupId>
                 <artifactId>gmaven-plugin</artifactId>
                 <version>1.4</version>
                 <configuration>
                     <source>
-                        /Users/elessard/Documents/ddf/ddf-support/support-jacoco/src/main/groovy/updatePomFiles.groovy
+                        src/main/groovy/updatePomFiles.groovy
                     </source>
                 </configuration>
             </plugin>
-            <!--
-            <plugin>
-                <groupId>org.codehaus.gmaven</groupId>
-                <artifactId>gmaven-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>execute</goal>
-                        </goals>
-                        <configuration>
-                            <source>${pom.basedir}/src/main/groovy/updatePomFiles.groovyles.groovy</source>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
         </plugins>
     </build>
 
     <dependencies>
-        <dependency>
-            <groupId>org.jruby</groupId>
-            <artifactId>jruby-complete</artifactId>
-            <version>1.7.10</version>
-        </dependency>
         <dependency>
             <groupId>org.codehaus.gmaven.runtime</groupId>
             <artifactId>gmaven-runtime-1.7</artifactId>
