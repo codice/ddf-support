@@ -29,7 +29,7 @@
 
     <modules>
         <module>support-checkstyle</module>
-        <module>DDF Support Code Coverage</module>
+        <module>support-jacoco</module>
     </modules>
     
     <properties>
