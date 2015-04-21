@@ -17,7 +17,20 @@ package org.codice.ddf.support
 import org.apache.maven.shared.invoker.DefaultInvocationRequest
 import org.apache.maven.shared.invoker.DefaultInvoker
 import org.apache.maven.shared.invoker.InvocationOutputHandler
+import org.w3c.dom.Document
+import org.w3c.dom.Node
+import org.xml.sax.InputSource
 
+import javax.xml.parsers.DocumentBuilder
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
+import javax.xml.xpath.XPath
+import javax.xml.xpath.XPathConstants
+import javax.xml.xpath.XPathExpression
+import javax.xml.xpath.XPathFactory
 import java.text.DecimalFormat
 
 /*
@@ -37,75 +50,50 @@ class Globals {
 
     static final String targetCoverage = "0.80"
     static final COVERAGE_ITEM_KEYS = ["instructions", "branches", "complexity", "lines"]
-    static final POM_HEADER = """<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  /************************************************************************
-  ** Distribution Statement C.  Distribution authorized to U.S. Government
-  ** Agencies and their contractors (Critical Technology)
-  **
-  ** DESTRUCTION NOTICE - Destroy by any method that will prevent disclosure
-  ** of the contents or reconstruction of the document.
-  **
-  ** Warning - This document contains technical data whose export is restricted
-  ** by the Arms Export Control Act (Title 22, U.S.C., Sec 2751, et seq.) or
-  ** the Export Administration Act of 1979, as amended, Title 50, U.S.C.,
-  ** App.2401 et seq.  Violations of these export laws are subject to severe
-  ** criminal penalties. Disseminate in accordance with provisions of DoD
-  ** Directive 5203.25.
-  **
-  ** (C) Copyright 2011 Lockheed Martin
-  ** Unlimited Government Rights (FAR Subpart 27.4)
-  ** Government right to use, disclose, reproduce, prepare derivative works,
-  ** distribute copies to the public, and perform and display publicly, in any
-  ** manner and for any purpose, and to have or permit others to do so.
-  **
-  ************************************************************************/
-  -->
-"""
     static final JACOCO_CONFIG_TEMPLATE = """
-        <plugin>
-            <groupId>org.jacoco</groupId>
-            <artifactId>jacoco-maven-plugin</artifactId>
-            <executions>
-                <execution>
-                    <id>default-check</id>
-                    <goals>
-                        <goal>check</goal>
-                    </goals>
-                    <configuration>
-                        <haltOnFailure>true</haltOnFailure>
-                        <rules>
-                            <rule>
-                                <element>BUNDLE</element>
-                                <limits>
-                                    <limit>
-                                        <counter>INSTRUCTION</counter>
-                                        <value>COVEREDRATIO</value>
-                                        <minimum>{instructions-ratio}</minimum>
-                                    </limit>
-                                    <limit>
-                                        <counter>BRANCH</counter>
-                                        <value>COVEREDRATIO</value>
-                                        <minimum>{branches-ratio}</minimum>
-                                    </limit>
-                                    <limit>
-                                        <counter>COMPLEXITY</counter>
-                                        <value>COVEREDRATIO</value>
-                                        <minimum>{complexity-ratio}</minimum>
-                                    </limit>
-                                    <limit>
-                                        <counter>LINE</counter>
-                                        <value>COVEREDRATIO</value>
-                                        <minimum>{lines-ratio}</minimum>
-                                    </limit>
-                                </limits>
-                            </rule>
-                        </rules>
-                    </configuration>
-                </execution>
-            </executions>
-        </plugin>
-        """
+    <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <executions>
+            <execution>
+                <id>default-check</id>
+                <goals>
+                    <goal>check</goal>
+                </goals>
+                <configuration>
+                    <haltOnFailure>true</haltOnFailure>
+                    <rules>
+                        <rule>
+                            <element>BUNDLE</element>
+                            <limits>
+                                <limit>
+                                    <counter>INSTRUCTION</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>{instructions-ratio}</minimum>
+                                </limit>
+                                <limit>
+                                    <counter>BRANCH</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>{branches-ratio}</minimum>
+                                </limit>
+                                <limit>
+                                    <counter>COMPLEXITY</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>{complexity-ratio}</minimum>
+                                </limit>
+                                <limit>
+                                    <counter>LINE</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>{lines-ratio}</minimum>
+                                </limit>
+                            </limits>
+                        </rule>
+                    </rules>
+                </configuration>
+            </execution>
+        </executions>
+    </plugin>
+    """
 }
 
 /**
@@ -131,7 +119,11 @@ class OutputHandler implements InvocationOutputHandler {
             def matcher = (line =~ /^.* ([a-z]+) covered ratio is ([0-9.]+).*/)
             def ratioName = matcher[0][1]
             def ratioValue = matcher[0][2]
-            // printf("***** Covered [%s] ratio: [%f]\n", ratioName, ratioValue)
+
+            if (Globals.debug) {
+                println "***** Covered ${ratioName} ratio: ${ratioValue}"
+            }
+
             ratios.put(ratioName, ratioValue)
         }
     }
@@ -146,6 +138,17 @@ class OutputHandler implements InvocationOutputHandler {
  */
 class JaCoCoPomUpdater {
 
+    private XPathFactory xPathFactory = XPathFactory.newInstance();
+    private XPath xpath = xPathFactory.newXPath();
+    private XPathExpression jaCoCoPlugInXPath = xpath.compile('/project/build/plugins/plugin/artifactId[text()="jacoco-maven-plugin"]');
+    private XPathExpression plugInsXPath = xpath.compile('/project/build/plugins');
+    private DocumentBuilderFactory factory;
+
+    public JaCoCoPomUpdater() {
+        factory = DocumentBuilderFactory.newInstance();
+        factory.setIgnoringComments(false);
+        factory.setValidating(false);
+    }
     /**
      * Recursively processes all the pom.xml files found under the root directory provided. This method will
      * automatically skip the pom.xml files that already contain a JaCoCo configuration element. The files that don't
@@ -164,44 +167,42 @@ class JaCoCoPomUpdater {
     }
 
     private void processPomFile(File pomFile) {
-        def pom = new XmlParser().parse(pomFile)
+        def builder = factory.newDocumentBuilder();
+        def document = builder.parse(pomFile);
 
-        if (!isJaCoCoAlreadyConfigured(pom)) {
-            println "${pomFile.path}: jacoco-maven-plugin not found. Configuring."
+        Node plugInsNode = (Node) plugInsXPath.evaluate(document, XPathConstants.NODE)
 
-            try {
-                Map<String, Float> extractedRatios = extractCoverageRatiosFromPomFile(pomFile)
-                def output = generateJaCoCoConfiguration(extractedRatios)
+        if (plugInsNode == null) {
+            println "${pomFile.path}: No <build> or <plugins> elements found. Skipping."
+            return
+        }
 
-                if (pom.build == null || pom.build.plugins == null || pom.build.plugins[0] == null) {
-                    println "${pomFile.path}: No <build> or <plugins> elements found. Skipping."
-                    return
-                }
-
-                def jaCoCoPlugInNode = new XmlParser().parseText(output)
-                pom.build.plugins[0].append(jaCoCoPlugInNode)
-
-                updatePomFile(pomFile, pom)
-            }
-            catch (RuntimeException e) {
-                println "${pomFile.path} failed. Skipping."
-                e.printStackTrace()
-            }
-        } else {
+        if (isJaCoCoAlreadyConfigured(document)) {
             println "${pomFile.path}: jacoco-maven-plugin already configured. Skipping."
+            return
+        }
+
+        println "${pomFile.path}: jacoco-maven-pluginnot found. Configuring."
+
+        try {
+            Map<String, Float> extractedRatios = extractCoverageRatiosFromPomFile(pomFile)
+            def jaCoCoPlugInNode = generateJaCoCoConfiguration(extractedRatios)
+            plugInsNode.appendChild(document.importNode(jaCoCoPlugInNode, true))
+
+            updatePomFile(pomFile, document)
+        }
+        catch (RuntimeException e) {
+            println "${pomFile.path} failed. Skipping."
+            e.printStackTrace()
         }
     }
 
-    private boolean isJaCoCoAlreadyConfigured(Node pom) {
-        def configured = false;
+    private boolean isJaCoCoAlreadyConfigured(Document pom) {
+        return (jaCoCoPlugInXPath.evaluate(pom, XPathConstants.NODE) != null)
+    }
 
-        pom.build.plugins.plugin.each() {
-            if (it.artifactId.text().equals("jacoco-maven-plugin")) {
-                configured = true
-            }
-        }
-
-        return configured
+    private boolean buildPluginElementExist(Document pom) {
+        return plugInsXPath.evaluate(pom, XPathConstants.NODE) != null
     }
 
     private Map<String, Float> extractCoverageRatiosFromPomFile(File pomFile) {
@@ -234,16 +235,22 @@ class JaCoCoPomUpdater {
             output = output.replace("{" + it.key + "-ratio}", formatter.format(ratio))
         }
 
-        return output
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        InputSource is = new InputSource(new StringReader(output.replaceAll(/\s+/, '')));
+        return builder.parse(is).getDocumentElement()
     }
 
-    private void updatePomFile(File pomFile, Node pom) {
-        def writer = new PrintWriter(pomFile)
-        def xmlPrinter = new XmlNodePrinter(writer, "    ")
-        xmlPrinter.setPreserveWhitespace(true)
-
-        writer.print(Globals.POM_HEADER)
-        xmlPrinter.print(pom)
+    private void updatePomFile(File pomFile, Document pom) {
+        def fileWriter = new FileWriter(pomFile)
+        def xmlOutput = new StreamResult(fileWriter)
+        def transformerFactory = TransformerFactory.newInstance()
+        def transformer = transformerFactory.newTransformer()
+        transformer.setOutputProperty(OutputKeys.METHOD, "xml")
+        transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4")
+        transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no")
+        transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+        transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8")
+        transformer.transform(new DOMSource(pom), xmlOutput)
     }
 }
 
