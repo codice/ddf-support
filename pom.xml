@@ -30,6 +30,7 @@
     <modules>
         <module>support-checkstyle</module>
         <module>support-jacoco</module>
+        <module>support-findbugs</module>
     </modules>
     
     <properties>
