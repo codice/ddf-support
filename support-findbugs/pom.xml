@@ -14,15 +14,15 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-	
-	<parent>
-		<groupId>ddf.support</groupId>
-		<artifactId>support-pom</artifactId>
-		<version>2.3.1-SNAPSHOT</version>
-	</parent>
 
-	<artifactId>support-findbugs</artifactId>
-	<name>DDF Support Findbugs</name>
-	<description>DDF Findbugs contains file for finding bugs</description>
+    <parent>
+		    <groupId>ddf.support</groupId>
+		    <artifactId>support-pom</artifactId>
+		    <version>2.3.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>support-findbugs</artifactId>
+    <name>DDF Support Findbugs</name>
+    <description>DDF Findbugs contains file for finding bugs</description>
 
 </project>
