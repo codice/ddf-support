@@ -68,4 +68,15 @@
         <sha1>D1D3B08AC83FEE35CD6F5177DA4E2E5E3D51259A</sha1>
         <cve>CVE-2011-5034</cve>
     </suppress>
+
+    <!--
+        CVE-2011-2730 only applies when using JSP Expression Language (EL) which is not used in DDF.
+     -->
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-osgi-core-1.2.1.jar
+   ]]></notes>
+        <sha1>E5666DFAC49C4B0488EF3F53E6D9232783697817</sha1>
+        <cve>CVE-2011-2730</cve>
+    </suppress>
 </suppressions>
