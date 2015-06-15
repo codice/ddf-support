@@ -410,7 +410,6 @@
 		</module>
 		<module name="Indentation">
 			<property name="caseIndent" value="0"/>
-			<property name="lineWrappingIndentation" value="8"/>
 		</module>
 
 	</module>
