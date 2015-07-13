@@ -6,6 +6,11 @@
       <username>ddf</username>
       <password>${env.NEXUS_PASSWORD}</password>
     </server>
+    <server>
+      <id>reports</id>
+      <username>ddf</username>
+      <password>${env.NEXUS_PASSWORD}</password>
+    </server>
   </servers>
   
   <profiles>
