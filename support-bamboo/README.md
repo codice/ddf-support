@@ -19,7 +19,7 @@ These scripts are used to integrate Bamboo CI builds with GitHub pull requests. 
 
 1. Create a separate plan for GitHub PR builds.
 2. Add as many stages as needed for the build and as many jobs as needed in each stage
-3. Within each job, add the following tasks in the order shown:
+3. Within each job, unless specified otherwise, add the following tasks in the order shown:
   * Source Code Checkout -- checkout ddf-support
   * Script -- run buildStarted.sh to update GitHub build status to in-progress. Only needed in first job of the build
   * Script -- run checkoutRepo.sh to checkout the correct PR
@@ -28,13 +28,17 @@ These scripts are used to integrate Bamboo CI builds with GitHub pull requests. 
 
     `Final Tasks`
   * Script -- run jobComplete.sh. If variable jobResult was not injected, sends a failure notice to the PR status on GitHub
-4. Add a Notification stage at the end of the build plan and give it a job with the following tasks
-  * Source Code Checkout -- checkout ddf-support
-  * Script -- run planComplete.sh to send a success notice to the PR status on GitHub
+4. Choose one of the following methods to notify GitHub of build success:
+  a. If the final stage of the build has **more than one job**, add a Notification stage at the end of the build plan and give it a job with the following tasks.
+    * Source Code Checkout -- checkout ddf-support
+    * Script -- run planComplete.sh to send a success notice to the PR status on GitHub
 
-**Note:** These scripts require a number of variables that are not present in a default Bamboo build. To make the plan run properly, use the Bamboo REST api `/queue/{projectKey}-{buildKey}-{buildNumber}` endpoint to trigger a custom build, and pass in the following variables:
-* pull_num: The number used to identify the PR
-* pull_sha: The hash of the commit that needs to be built
+  b. If the final stage of the build has **exactly one job**, replace the final task in the job with the following task:
+    * Script -- run finalJobComplete.sh. This will send a success notice to the GitHub PR status if the jobResult variable was injected. Otherwise, it will send a failure notice.
+
+**Note:** These scripts require a number of variables that are not present in a default Bamboo build. To make the plan run properly, use the Bamboo REST api `queue/{projectKey}-{buildKey}` endpoint to trigger a custom build, and pass in the following variables:
+  * pull_num: The number used to identify the PR
+  * pull_sha: The hash of the commit that needs to be built
 
 ## Configuring Maven Builds Using settings.xml
 
