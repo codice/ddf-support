@@ -1,0 +1,25 @@
+{
+  "name": "hubot-bamboo-prbuild",
+  "description": "Receives github webhooks from pull_request events and queues Bamboo builds with custom variables ",
+  "version": "1.0.0",
+  "author": "Joshua Smith",
+  "main": "index.coffee",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "bamboo",
+    "github",
+    "PR",
+    "pull",
+    "request",
+    "hubot"
+  ],
+  "licenses": [
+    {
+      "name": "LGPL",
+      "url": "http://www.gnu.org/licenses/lgpl.html"
+    }
+  ]
+}
