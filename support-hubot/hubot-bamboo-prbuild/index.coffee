@@ -120,7 +120,7 @@ module.exports = (robot) ->
                   robot.http(payload.pull_request.statuses_url)
                     .header('Authorization', "token #{github_api_token}")
                     .post('{"state": "failure", "context": "bamboo", "description": "' + "#{json_body.message}" + '", "target_url": "' +
-                          "#{bamboo_url}/browse/#{build_key}\"}")
+                          "#{bamboo_url}/browse/#{build_plan}\"}")
 
         repoDeltas(payload.repository.url, payload.number, bamboo_post)
 
