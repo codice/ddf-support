@@ -74,12 +74,12 @@ module.exports = (robot) ->
                 files = (obj.filename.split("/") for obj in files_body)
 
                 root_delta = files.some((el) -> el.length == 1)
-                redFunc = (acc, val) ->
+                removeDuplicateSubmodulesExcludeDistro = (acc, val) ->
                   if val.length > 1 and val[0] not in acc and val[0] != "distribution"
                     acc.concat(val[0])
                   else
                     acc
-                directories = files.reduce(redFunc, [])
+                directories = files.reduce(removeDuplicateSubmodulesExcludeDistro, [])
                 console.log "Submodules to build - " + directories.toString()
 
                 if root_delta or directories.length > 1
