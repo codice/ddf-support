@@ -38,6 +38,7 @@ These scripts are used to integrate Bamboo CI builds with GitHub pull requests. 
   * pull_num: The number used to identify the PR
   * pull_sha: The hash of the commit that needs to be built
   * git_repo_url: The base repository to which the PR code changes will be merged  
+  * submodule: The specific submodule to be built for a PR build
   
   To queue a pull request build for ddf-catalog, where bamboo is hosted at `https://bamboohost:8085/builds` and has a project with projectKey=`DDFPR` and buildKey=`CAT`, use the following request: 
   
