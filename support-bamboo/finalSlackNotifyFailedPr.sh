@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
 
 # On a failed automatic PR bamboo build, notifies specified slack channel with links to the PR and the failed build
-# Requires that 2 parameters be passed in: 1. Name of Slack channel to post to preceeded by a # sign, or it's ID. 2. The URL of the pre-configured Slack webhook.
+# Requires that 2 parameters be passed in:
+# $1 = Name of Slack channel to post to preceeded by a # sign, or it's ID.
+# $2 = The URL of the pre-configured Slack webhook.
 
 if [ "${bamboo_inject_jobResult}" != "Success" ]; then
 
 	echo "The build could not complete due to an error. Notifying Slack of build failure"
-    curl -X POST --data-urlencode "payload={\"text\": \"Build Failure in <${bamboo_resultsUrl}|${bamboo_planName} - #${bamboo_buildNumber}>\nFailed PR: <${bamboo_github_ddf_url}/pull/${bamboo_pull_num}|${bamboo_pull_ref}>\", \"channel\": \"$1\", \"username\": \"bamboo\", \"icon_emoji\": \":bamboo:\"}" $2
+    curl -X POST --data-urlencode "payload={
+        \"text\": \"Build Failure in <${bamboo_resultsUrl}|${bamboo_planName} - #${bamboo_buildNumber}>\nFailed PR: <${bamboo_github_ddf_url}/pull/${bamboo_pull_num}|${bamboo_pull_ref}>\",
+        \"channel\": \"$1\",
+        \"username\": \"bamboo\",
+        \"icon_emoji\": \":bamboo:\"
+    }" $2
 
 fi
