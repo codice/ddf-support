@@ -6,9 +6,6 @@
 #   $2 = The URL of the pre-configured Slack webhook.
 # For examples, see README.md under ddf-support/support-bamboo
 
-bamboo_planKey="DDF-DIST"
-bamboo_buildNumber="58"
-
 get_atlassian() {
     curl "https://codice.atlassian.net/builds/rest/api/latest/result/$1"
     if [ $? != 0 ]; then
