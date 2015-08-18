@@ -2,8 +2,9 @@
 
 # On a failed automatic PR bamboo build, notifies specified slack channel with links to the PR and the failed build
 # Requires that 2 parameters be passed in:
-# $1 = Name of Slack channel to post to preceeded by a # sign, or it's ID.
+# $1 = Name of Slack channel to post to preceeded by a # sign, or its ID.
 # $2 = The URL of the pre-configured Slack webhook.
+# For examples, see README.md under ddf-support/support-bamboo
 
 if [ "${bamboo_inject_jobResult}" != "Success" ]; then
 
@@ -14,5 +15,9 @@ if [ "${bamboo_inject_jobResult}" != "Success" ]; then
         \"username\": \"bamboo\",
         \"icon_emoji\": \":bamboo:\"
     }" $2
+    if [ $? != 0 ]; then
+        echo "[ERROR] curl command to Bamboo API failed with an exit code of $?. No Slack message was sent."
+        exit 0
+    fi
 
 fi

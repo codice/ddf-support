@@ -47,8 +47,13 @@ These scripts are used to integrate Bamboo CI builds with GitHub pull requests. 
    ```
 
 **Note:** In addition to the above Hubot variables, the Slack notification scripts also require that 2 arguments are passed in under the "Argument" field in the bamboo "Script" task. Both arguments must be within separate quotations:
-    1. The first argument is the channel name preceeded by a # sign, or just a channel ID. (ex, "#channel-name" or "Q81U5HJJ1")
-    2. The second argument must the the URL to the pre-configured Slack webhook. Refer to Slack's documentation for more information about setting up an incoming webhook on Slack.
+1. The first argument is the channel name preceeded by a # sign, or just a channel ID. (ex, "#channel-name" or "Q81U5HJJ1")
+2. The second argument must the the URL to the pre-configured Slack webhook. Refer to Slack's documentation for more information about setting up an incoming webhook on Slack.
+    ```
+    "#channel-name" "https://hooks.slack.com/services/N7D82K9J0/B4HY8I3KS/ASU3LN82K"
+    OR
+    "J83K0J340" "https://hooks.slack.com/services/N7D82K9J0/B4HY8I3KS/ASU3LN82K"
+    ```
 
 ## Configuring Maven Builds Using settings.xml
 
