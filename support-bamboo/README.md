@@ -46,6 +46,17 @@ These scripts are used to integrate Bamboo CI builds with GitHub pull requests. 
    curl -i -X POST https://<username>:<password>@bamboohost:8085/builds/rest/api/latest/queue/DDFPR-CAT?bamboo.variable.pull_num=42&bamboo.variable.pull_sha=da39a3ee5e6b4b0d3255bfef95601890afd80709&bamboo.variable.git_repo_url=https://github.com/codice/ddf-support.git"
    ```
 
+**Note:** In addition to the above Hubot variables, the Slack notification scripts also require that 2 arguments are passed in under the "Argument" field in the bamboo "Script" task. Both arguments must be within separate quotations:
+
+1. The first argument is the channel name preceeded by a # sign, or just a channel ID. (ex, "#channel-name" or "Q81U5HJJ1")
+2. The second argument must the the URL to the pre-configured Slack webhook. Refer to Slack's documentation for more information about setting up an incoming webhook on Slack.
+
+    ```
+    "#channel-name" "https://hooks.slack.com/services/N7D82K9J0/B4HY8I3KS/ASU3LN82K"
+    OR
+    "J83K0J340" "https://hooks.slack.com/services/N7D82K9J0/B4HY8I3KS/ASU3LN82K"
+    ```
+
 ## Configuring Maven Builds Using settings.xml
 
 This file is used to configure Maven with necessary credentials for downloading artifacts during the build, and to point it to the release and snapshot repositories where those artifacts are stored. It should be used as follows:
