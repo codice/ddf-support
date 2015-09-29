@@ -63,7 +63,7 @@ module.exports = (robot) ->
                 # The DISTRO PR build builds the distro + integration tests with separate tasks.
 
                 repoDeltas = (base_url, pr_num, callback) ->
-                    robot.http(base_url + "/pulls/" + pr_num + "/files")
+                    robot.http(base_url + "/pulls/" + pr_num + "/files?per_page=100")
                     .header('Authorization', "token #{github_api_token}")
                     .get() (err, res, body) ->
                         if err
