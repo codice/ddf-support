@@ -3,7 +3,7 @@
  * Copyright (c) Codice Foundation
  *
  * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
- * version 3 of the License, or any later version. 
+ * version 3 of the License, or any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
@@ -13,10 +13,10 @@
 <!DOCTYPE module PUBLIC
         "-//Puppy Crawl//DTD Check Configuration 1.2//EN"
         "http://www.puppycrawl.com/dtds/configuration_1_2.dtd">
- 
- 
+
+
 <module name="Checker">
-    
+
     <!--XML Header checks -->
     <module name="RegexpHeader">
         <property name="headerFile" value="${checkstyle.header.file}"/>
@@ -24,7 +24,7 @@
         <!-- Line 2:  This allows a line for the XML declaration, but does not require it. -->
         <!-- Line 3:  This allows a line that starts an XML comment block, but does not require it.-->
         <!-- Line 18: This allows a line that ends an XML comment block, but does not require it.-->
-        <property name="multiLines" value="1,2,3,18"/> 
+        <property name="multiLines" value="1,2,3,18"/>
         <property name="fileExtensions" value="java, xml"/>
     </module>
 
@@ -58,11 +58,6 @@
 	<!-- See http://checkstyle.sf.net/config_misc.html#Translation -->
 	<!-- Shouldn't be needed as we only support English and don't really use property files -->
     <module name="Translation">
-		<property name="severity" value="ignore"/>
-	</module>
-
-
-	<module name="StrictDuplicateCode">
 		<property name="severity" value="ignore"/>
 	</module>
 
@@ -259,13 +254,7 @@
 		<module name="IllegalThrows">
 			<property name="illegalClassNames" value="java.lang.Error,java.lang.RuntimeException"/>
 		</module>
-		<module name="RedundantThrows">
-			<property name="severity" value="ignore"/>
-		</module>
 		<module name="PackageDeclaration"/>
-		<module name="JUnitTestCase">
-			<property name="severity" value="warning"/>
-		</module>
 
         <module name="ReturnCount">
             <property name="max" value="6"/>
