@@ -17,4 +17,123 @@
     <Match>
         <Confidence value="3" />
     </Match>
+
+    <!-- ddf.security.Subject and has been part of several releases as part of the Security API -->
+    <Match>
+        <Class name="ddf.security.Subject"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE"/>
+    </Match>
+    <!-- Other classes that have already been named in multiple releases -->
+
+    <Match>
+        <Class name="ddf.security.sts.claimsHandler.LdapClaimsHandler"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS"/>
+    </Match>
+    <Match>
+        <Class name="org.codice.ddf.spatial.ogc.wfs.v1_0_0.catalog.converter.FeatureConverterFactory"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE"/>
+    </Match>
+
+    <Match>
+        <Class name="org.codice.ddf.spatial.ogc.wfs.v2_0_0.catalog.converter.FeatureConverterFactory"/>
+        <Bug pattern="NM_SAME_SIMPLE_NAME_AS_INTERFACE"/>
+    </Match>
+
+    <!-- The super class org.apache.shiro.subject.support.DelegatingSubject does not define an accessible void constructor -->
+    <Match>
+        <Class name="ddf.security.impl.SubjectImpl"/>
+        <Bug pattern="SE_NO_SUITABLE_CONSTRUCTOR"/>
+    </Match>
+
+    <!-- Packages containing deprecated classes -->
+    <Match>
+        <Package name="ddf.catalog.data"/>
+    </Match>
+    <Match>
+        <Package name="ddf.catalog.data"/>
+    </Match>
+    <Match>
+        <Package name="ddf.catalog.event"/>
+    </Match>
+    <Match>
+        <Package name="ddf.catalog.federation"/>
+    </Match>
+    <Match>
+        <Package name="ddf.catalog.filter"/>
+    </Match>
+    <Match>
+        <Package name="ddf.catalog.operation"/>
+    </Match>
+    <Match>
+        <Package name="ddf.catalog.plugin"/>
+    </Match>
+    <Match>
+        <Package name="ddf.catalog.resource"/>
+    </Match>
+    <Match>
+        <Package name="ddf.catalog.service"/>
+    </Match>
+    <Match>
+        <Package name="ddf.catalog.source"/>
+    </Match>
+    <Match>
+        <Package name="ddf.catalog.transform"/>
+    </Match>
+    <Match>
+        <Package name="ddf.catalog.util"/>
+    </Match>
+    <Match>
+        <Package name="ddf.catalog.validation"/>
+    </Match>
+
+    <!-- Unused class that needs to be removed -->
+    <Match>
+        <Class name="ddf.catalog.federation.base.AbstractFederatedQueryMonitor"/>
+    </Match>
+
+    <!-- resource retrieval thread. Avoided copying steam due to potential size/memory issues -->
+    <Match>
+        <Class name="ddf.catalog.data.impl.BinaryContentImpl"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+
+    <!-- Deprecated -->
+    <Match>
+        <Class name="ddf.catalog.impl.filter.FuzzyFunction"/>
+    </Match>
+    <Match>
+        <Class name="org.codice.ddf.commands.catalog.SpatialCommand"/>
+    </Match>
+    <!-- need to make decision on non-serializeable fields -->
+  <!--  <Match>
+        <Class name="ddf.catalog.transformer.xml.XmlResponseQueueTransformer$MetacardForkTask"/>
+        <Bug pattern="SE_BAD_FIELD"/>
+    </Match> -->
+
+    <!-- Auto generated classes  -->
+    <Match>
+        <Package name="org.codice.ddf.parser.xml.domain"     />
+    </Match>
+    <Match>
+        <Package name="ddf.catalog.transformer.xml.binding"/>
+    </Match>
+    <Match>
+        <Class name="org.codice.ddf.spatial.ogc.wcs.catalog.GetCapabilitiesRequest"/>
+    </Match>
+    <Match>
+        <Package name="net.opengis.cat.csw.v_2_0_2"/>
+    </Match>
+    <Match>
+        <Package name="net.opengis.cat.csw.v_2_0_2.dc.elements"/>
+    </Match>
+    <Match>
+        <Package name="net.opengis.wfs.v_2_0_0"/>
+    </Match>
+
+    <!-- Explicitly attempting the default encoding in the event that using UTF-8 fails -->
+    <Match>
+        <Class name="org.codice.ddf.spatial.ogc.csw.catalog.converter.XStreamAttributeCopier"/>
+        <Bug pattern="DM_DEFAULT_ENCODING"/>
+    </Match>
+
 </FindBugsFilter>
