@@ -112,22 +112,4 @@
         <cve>CVE-2014-0002</cve>
     </suppress>
 
-    <!--
-        CVE-2011-4838 relates to JRuby, which is only used to generate documentation and never
-        used in production. Marking as a false positive.
-    -->
-    <suppress>
-        <cve>CVE-2011-4838</cve>
-    </suppress>
-
-    <!--
-        CVE-2009-3245 are related to a problem with the version of openssl bundled with
-        jruby-complete-1.7.16.1.jar, which is a transitive dependency of asciidoctorj-1.5.2.jar.
-        Since asciidoc is only used to generate our documentation and is not used at runtime,
-        marking the vulnerability as a false positive.
-    -->
-    <suppress>
-        <cve>CVE-2009-3245</cve>
-    </suppress>
-
 </suppressions>
