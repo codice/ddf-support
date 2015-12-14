@@ -102,7 +102,7 @@
     </suppress>
 
     <!--
-        CVE-2014-0003, CVE-2014-0002 Vulnerabilities in camel before 2.12.3, we use 2.14.2, false positive?
+        CVE-2014-0003, CVE-2014-0002 Vulnerabilities in camel before 2.12.3, we use 2.14.2
     -->
     <suppress>
         <cve>CVE-2014-0003</cve>
