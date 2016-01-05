@@ -50,9 +50,6 @@
         <Package name="ddf.catalog.data"/>
     </Match>
     <Match>
-        <Package name="ddf.catalog.data"/>
-    </Match>
-    <Match>
         <Package name="ddf.catalog.event"/>
     </Match>
     <Match>
