@@ -3,7 +3,7 @@
  * Copyright (c) Codice Foundation
  *
  * This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as published by the Free Software Foundation, either
- * version 3 of the License, or any later version. 
+ * version 3 of the License, or any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  * See the GNU Lesser General Public License for more details. A copy of the GNU Lesser General Public License is distributed along with this program and can be found at
@@ -125,6 +125,12 @@
     </Match>
     <Match>
         <Package name="net.opengis.wfs.v_2_0_0"/>
+    </Match>
+    <Match>
+        <Package name="net.opengis.cat.wrs.v_1_0_2"/>
+    </Match>
+    <Match>
+        <Package name="oasis.names.tc.ebxml_regrep.xsd.rim._3"/>
     </Match>
 
     <!-- Explicitly attempting the default encoding in the event that using UTF-8 fails -->
