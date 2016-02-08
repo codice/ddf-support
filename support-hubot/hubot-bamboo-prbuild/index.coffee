@@ -99,7 +99,7 @@ module.exports = (robot) ->
                 "bamboo.variable.pull_sha": eventPayload.pull_request.head.sha,
                 "bamboo.variable.pull_num": eventPayload.number,
                 "bamboo.variable.git_repo_url": eventPayload.repository.clone_url,
-                "bamboo.variable.modules": modulesToBuild
+                "bamboo.variable.modules": modulesToBuild.join()
             })
 
         console.log "[DEBUG] Bamboo Query: #{bambooQuery}"
