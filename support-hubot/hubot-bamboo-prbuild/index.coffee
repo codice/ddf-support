@@ -1,137 +1,234 @@
 # Description:
-#   Listens for github webhook notifications of PRs and triggers Bamboo builds.
-#
-# Dependencies:
-#   "url":
-#   "querystring":
+#   Listens for GitHub webhook pull request notifications and triggers Bamboo builds.
 #
 # Configuration:
 #   bamboo_user
 #   bamboo_pass
 #   github_api_token
-#
-# Commands:
-#   Listens for Pull Request notifications from Webhook
 
 url = require('url')
-query_string = require('querystring')
-action_types = ['opened', 'synchronize', 'reopened']
-event_types = ['pull_request']
+pathUtil = require('path')
+queryString = require('querystring')
+actionTypes = ['opened', 'synchronize', 'reopened']
+eventTypes = ['pull_request']
 
-bamboo_user = process.env.bamboo_user
-bamboo_pass = process.env.bamboo_pass
-github_api_token = process.env.github_api_token
+prPlanName = "DDFPR-ALL"
 
-root_pr_plan = "DDFPR-ROOT"
-distro_pr_plan = "DDFPR-DIS"
-module_pr_plan = "DDFPR-MOD"
+bambooUser = process.env.bamboo_user
+bambooPassword = process.env.bamboo_pass
+gitHubApiToken = process.env.github_api_token
 
 module.exports = (robot) ->
-    robot.router.post "/hubot/trigger-bamboo", (req, res) ->
-        console.log "---"
-        console.log "Request received: #{req.url}"
 
-        # Extract Bamboo plan variables from query url
-        query = query_string.parse(url.parse(req.url).query)
-        bamboo_url = query.bamboo
-        if !bamboo_url?
-            console.log "Bad request. Missing parameters in query string"
-            res.writeHead 400
-            res.end "Missing parameters in query string\n"
+    # Extracts 'bamboo' request parameter. Fails request if missing.
+    getBambooUrl = (request, response) ->
+        query = queryString.parse(url.parse(request.url).query)
+        bambooUrl = query.bamboo
+
+        if !bambooUrl?
+            console.log "[ERROR] Bad request. Missing 'bamboo' parameter in query string"
+            response.writeHead 400
+            response.end "Missing parameters in query string\n"
+
+        return bambooUrl
+
+
+    # Removes filename from path.
+    removeFileName = (path) ->
+        return pathUtil.dirname(path)
+
+
+    # Reduce function that removes duplicate paths from list.
+    removeDuplicatePaths = (paths, path) ->
+        if path not in paths then paths.concat(path) else paths
+
+
+    # Gets the list of changed paths from a list of changes files.
+    # The returned list is sorted in reverse order and doesn't contain any duplicate paths.
+    getChangedPaths = (files) ->
+        changedPaths = (removeFileName(obj.filename) for obj in files when obj.status isnt "removed")
+        changedPaths = changedPaths.reduce(removeDuplicatePaths, [])
+        changedPaths.sort().reverse();
+
+        console.log "[INFO] Changed files:"
+        console.log changedPaths
+
+        return changedPaths
+
+
+    # Computes the list of modules that have changed and need to be rebuilt.
+    computeChangedModules = (modules, changedPaths) ->
+        console.log "[INFO] PR modules:"
+        console.log modules
+
+        modulesToBuild = []
+
+        for changedPath in changedPaths
+            for module in modules when changedPath.match("^" + module + ".*")
+                if module not in modulesToBuild then modulesToBuild.push(module)
+                break;
+
+        console.log "[INFO] Modules to build:"
+        console.log modulesToBuild
+
+        return modulesToBuild
+
+
+    # Checks if a Bamboo plan has been successfully submitted.
+    isSubmitSuccessful = (responseBody) ->
+        return !responseBody.hasOwnProperty("status-code")
+
+
+    # Updates the GitHub PR status.
+    updateGitHubStatus = (url, state, description, targetUrl) ->
+        robot.http(url)
+            .header('Authorization', "token #{gitHubApiToken}")
+            .post(JSON.stringify({
+                      "state": state,
+                      "context": "bamboo",
+                      "description": description,
+                      "target_url": targetUrl
+                  }))
+
+
+    # Submits Bamboo build request.
+    submitBuildRequest = (bambooUrl, eventPayload, modulesToBuild) ->
+        bambooQuery = "#{bambooUrl}/rest/api/latest/queue/#{prPlanName}?" +
+            queryString.stringify({
+                "bamboo.variable.pull_ref": eventPayload.pull_request.head.ref,
+                "bamboo.variable.pull_sha": eventPayload.pull_request.head.sha,
+                "bamboo.variable.pull_num": eventPayload.number,
+                "bamboo.variable.git_repo_url": eventPayload.repository.clone_url,
+                "bamboo.variable.modules": modulesToBuild.join()
+            })
+
+        console.log "[DEBUG] Bamboo Query: #{bambooQuery}"
+
+        robot.http(bambooQuery).auth(bambooUser, bambooPassword).header('Accept', 'application/json')
+            .post() (error, response, body) ->
+                if error
+                    console.log "[ERROR] Failed to submit Bamboo build request: #{error}"
+                    updateGitHubStatus(eventPayload.pull_request.statuses_url,
+                        "failure", "Failed to submit Bamboo build request: #{error}", "")
+                    return
+
+                jsonBody = JSON.parse body
+
+                if isSubmitSuccessful(jsonBody)
+                    updateGitHubStatus(eventPayload.pull_request.statuses_url,
+                        "pending", "A Bamboo build has been queued",
+                        "#{bambooUrl}/browse/#{jsonBody.buildResultKey}")
+                else
+                    console.log "[ERROR] Failed to submit Bamboo build, request: #{body}"
+                    updateGitHubStatus(eventPayload.pull_request.statuses_url,
+                        "failure", "#{jsonBody.message}", "#{bambooUrl}/browse/#{prPlanName}")
+
+
+    # Retrieves list of Maven modules for current PR
+    retrieveMavenModules = (gitHubUrl, sha, statusUrl, callback) ->
+        robot.http("#{gitHubUrl}/git/trees/#{sha}?recursive=1")
+            .get() (error, response, body) ->
+                if error
+                    console.log "[ERROR] Failed to retrieve list of directories from GitHub: #{error}"
+                    updateGitHubStatus(statusUrl, "failure",
+                        "Failed to retrieve list of directories from GitHub: #{error}", "")
+                    return
+
+                rateLimitRemaining = parseInt response.headers['x-ratelimit-remaining']
+
+                if rateLimitRemaining and rateLimitRemaining < 1
+                    console.log "[ERROR] Failed to retrieve list of directories from GitHub: Rate Limit hit."
+                    updateGitHubStatus(statusUrl, "failure",
+                        "Failed to retrieve list of directories from GitHub: Rate Limit hit.", "")
+                    return
+
+                gitTree = JSON.parse body
+
+                if gitTree.truncated == "true" or !gitTree.tree?
+                    console.log "[ERROR] Failed to retrieve all directories from GitHub."
+                    updateGitHubStatus(statusUrl, "failure",
+                        "Failed to retrieve all directories from GitHub.", "")
+                    return
+
+                # Build the list of modules by looking for all the pom.xml files that are not under
+                # a "resources" directory.
+                modules = (
+                    removeFileName(obj.path) for obj in gitTree.tree when obj.path? and
+                        obj.path.match(".*/pom.xml$") and not obj.path.match(".*/resources/.*")
+                )
+
+                # Need to reverse sort Maven modules to make sure the most specific modules are
+                # found first when building the list of modules to build.
+                # Example:
+                #   Maven modules in reverse order: [ a/c/d, a/c, a/b/c, a/b, a ]
+                #   Paths changed: [ a/b/x/y/z, a/c/d/x/y/z ]
+                #   Modules to rebuild: [ a/b, a/c/d ]
+                modules.sort().reverse()
+
+                callback(modules)
+
+
+    # Retrieves list of changed Maven modules for current PR
+    retrieveChangedModules = (gitHubUrl, prNumber, modules, statusUrl, callback) ->
+        robot.http("#{gitHubUrl}/pulls/#{prNumber}/files?per_page=100")
+            .get() (error, response, body) ->
+                if error
+                    console.log "[ERROR] Failed to retrieve changed files for PR: #{error}"
+                    updateGitHubStatus(statusUrl, "failure",
+                        "Failed to retrieve changed files for PR: #{error}", "")
+                    return
+
+                if response.headers.link
+                    # We need to paginate so there's more than 100 changed files in the PR.
+                    # Run a full build.
+                    console.log "[INFO] More than 100 changed files in the PR. Building all modules."
+                    modulesToBuild = ["."]
+                else
+                    changedPaths = getChangedPaths(JSON.parse body)
+                    modulesToBuild = computeChangedModules(modules, changedPaths)
+
+                callback(modulesToBuild)
+
+
+    # Request handler used to delay the processing of the incoming events.
+    # Needed to avoid race condition where GitHub can't find the sha when requesting the git/trees.
+    delayHandler = (seconds) ->
+        (request, response, next) -> setTimeout(next, seconds * 1000)
+
+
+    # Registers Hubot for GitHub Webhook POST requests
+    robot.router.post "/hubot/trigger-bamboo", delayHandler(5), (request, response) ->
+        console.log "---"
+        console.log "[INFO] Request received: #{request.url}"
+
+        bambooUrl = getBambooUrl(request, response)
+
+        if !bambooUrl?
             return
 
-        # Extract pull request info from webhook headers and payload
-        payload = req.body
-        action_type = payload.action
-        event_type = req.headers["x-github-event"]
+        eventPayload = request.body
+        actionType = eventPayload.action
+        eventType = request.headers["x-github-event"]
+
+        if eventType not in eventTypes or actionType not in actionTypes
+            return
+
+        sha = eventPayload.pull_request.head.sha
+        gitHubUrl = eventPayload.repository.url
+        prNumber = eventPayload.number
+        statusUrl = eventPayload.pull_request.statuses_url
 
         try
-            if event_type in event_types && action_type in action_types
-                # Determine which modules have modified files and trigger the appropriate PR build
-                # Cases:
-                #   1. Files change in the root
-                #     - trigger ROOT (full repo) PR build
-                #   2. Files change in multiple submodules
-                #     - trigger ROOT (full repo) PR build
-                #   3. Files change in only the distribution module
-                #     - trigger the DISTRO PR build
-                #   4. Files change in only one submodule that is not distribution (e.g. platform)
-                #     - trigger MODULE PR build
-                # The MODULE PR build will take a parameter that indicates the submodule to build
-                # and includes distro + integration tasks.
-                # The ROOT PR build builds from the reactor root with one maven task.
-                # The DISTRO PR build builds the distro + integration tests with separate tasks.
+            console.log "[INFO] Processing #{actionType}/#{eventType} in repo #{eventPayload.pull_request.html_url}."
 
-                repoDeltas = (base_url, pr_num, callback) ->
-                    robot.http(base_url + "/pulls/" + pr_num + "/files?per_page=100")
-                    .header('Authorization', "token #{github_api_token}")
-                    .get() (err, res, body) ->
-                        if err
-                            console.log "Encountered an error: #{err}"
-                            return
+            retrieveMavenModules(gitHubUrl, sha, statusUrl, (modules) ->
+                retrieveChangedModules(gitHubUrl, prNumber, modules, statusUrl, (modulesToBuild) ->
+                    submitBuildRequest(bambooUrl, eventPayload, modulesToBuild)))
 
-                        files_body = JSON.parse body
-                        files = (obj.filename.split("/") for obj in files_body)
-
-                        root_delta = files.some((el) -> el.length == 1)
-                        removeDuplicateSubmodulesExcludeDistro = (acc, val) ->
-                            if val.length > 1 and val[0] not in acc and val[0] != "distribution"
-                                acc.concat(val[0])
-                            else
-                                acc
-                        directories = files.reduce(removeDuplicateSubmodulesExcludeDistro, [])
-                        console.log "Submodules to build - " + directories.toString()
-
-                        if root_delta or directories.length > 1
-                            callback(root_pr_plan)
-                        else if directories.length == 0
-                            callback(distro_pr_plan)
-                        else
-                            callback(module_pr_plan, directories[0])
-
-                # Webhook was generated by valid pull request. Attempt to queue Bamboo PR build
-                console.log "Processing #{event_type} event in repo #{payload.pull_request.html_url}. Action: #{action_type}"
-                bamboo_post = (build_plan, submodule) ->
-                    bamboo_query = "#{bamboo_url}/rest/api/latest/queue/#{build_plan}?" +
-                        "bamboo.variable.pull_ref=#{payload.pull_request.head.ref}&" +
-                        "bamboo.variable.pull_sha=#{payload.pull_request.head.sha}&" +
-                        "bamboo.variable.pull_num=#{payload.number}&" +
-                        "bamboo.variable.git_repo_url=#{payload.repository.clone_url}"
-                    if (submodule?)
-                        bamboo_query = bamboo_query + "&bamboo.variable.submodule=#{submodule}"
-
-                    robot.http(bamboo_query)
-                    .auth(bamboo_user, bamboo_pass)
-                    .header('Accept', 'application/json')
-                    .post() (err, res, body) ->
-                        if err
-                            console.log "Encountered an error :( #{err}"
-                            return
-
-                        json_body = JSON.parse body
-
-                        # Determine whether build was successfully queued and update GitHub PR status accordingly
-                        if !json_body.hasOwnProperty("status-code")
-                            robot.http(payload.pull_request.statuses_url)
-                            .header('Authorization', "token #{github_api_token}")
-                            .post('{"state": "pending", "context": "bamboo", "description": "A Bamboo build has been queued", "target_url": "' +
-                                    "#{bamboo_url}/browse/#{json_body.buildResultKey}\"}")
-                        else
-                            console.log body
-                            robot.http(payload.pull_request.statuses_url)
-                            .header('Authorization', "token #{github_api_token}")
-                            .post('{"state": "failure", "context": "bamboo", "description": "' +
-                                    "#{json_body.message}" + '", "target_url": "' +
-                                    "#{bamboo_url}/browse/#{build_plan}\"}")
-
-                repoDeltas(payload.repository.url, payload.number, bamboo_post)
-
-
-            else if event_type not in event_types
-                console.log "Ignoring #{event_type} event in repo #{payload.pull_request.html_url}. Only pull_request events are handled"
-            else
-                console.log "Pull request #{payload.pull_request.html_url} was #{action_type}. Ignoring event as no code changes were made"
         catch error
-            console.log "#{error}. Request: #{req.body}"
+            console.log "[ERROR] Failed to submit PR build!"
+            console.log error.stack
+            console.log "[ERROR] Event payload:"
+            console.log JSON.stringify eventPayload
 
-        res.end "okay"
+        response.end "OK"
