@@ -9,10 +9,11 @@
 url = require('url')
 pathUtil = require('path')
 queryString = require('querystring')
-actionTypes = ['opened', 'synchronize', 'reopened']
+actionTypes = ['opened', 'synchronize', 'reopened', 'closed']
 eventTypes = ['pull_request']
 
 prPlanName = "DDFPR-ALL"
+masterPlanName = "DDF-MSTRINC"
 
 bambooUser = process.env.bamboo_user
 bambooPassword = process.env.bamboo_pass
@@ -31,6 +32,12 @@ module.exports = (robot) ->
             response.end "Missing parameters in query string\n"
 
         return bambooUrl
+
+    # Determines whether a pr build or master build is needed.
+    getPlanName = (eventPayload) ->
+        closed = eventPayload.action is "closed"
+        merged = eventPayload.pull_request.merged
+        if closed and merged then return masterPlanName else return prPlanName
 
 
     # Removes filename from path.
@@ -92,8 +99,8 @@ module.exports = (robot) ->
 
 
     # Submits Bamboo build request.
-    submitBuildRequest = (bambooUrl, eventPayload, modulesToBuild) ->
-        bambooQuery = "#{bambooUrl}/rest/api/latest/queue/#{prPlanName}?" +
+    submitBuildRequest = (bambooUrl, eventPayload, modulesToBuild, planName) ->
+        bambooQuery = "#{bambooUrl}/rest/api/latest/queue/#{planName}?" +
             queryString.stringify({
                 "bamboo.variable.pull_ref": eventPayload.pull_request.head.ref,
                 "bamboo.variable.pull_sha": eventPayload.pull_request.head.sha,
@@ -105,6 +112,7 @@ module.exports = (robot) ->
         console.log "[DEBUG] Bamboo Query: #{bambooQuery}"
 
         robot.http(bambooQuery).auth(bambooUser, bambooPassword).header('Accept', 'application/json')
+            .header('X-Atlassian-Token', 'no-check')
             .post() (error, response, body) ->
                 if error
                     console.log "[ERROR] Failed to submit Bamboo build request: #{error}"
@@ -121,7 +129,7 @@ module.exports = (robot) ->
                 else
                     console.log "[ERROR] Failed to submit Bamboo build, request: #{body}"
                     updateGitHubStatus(eventPayload.pull_request.statuses_url,
-                        "failure", "#{jsonBody.message}", "#{bambooUrl}/browse/#{prPlanName}")
+                        "failure", "#{jsonBody.message}", "#{bambooUrl}/browse/#{planName}")
 
 
     # Retrieves list of Maven modules for current PR
@@ -217,13 +225,14 @@ module.exports = (robot) ->
         gitHubUrl = eventPayload.repository.url
         prNumber = eventPayload.number
         statusUrl = eventPayload.pull_request.statuses_url
+        prPlanName = getPlanName(eventPayload)
 
         try
             console.log "[INFO] Processing #{actionType}/#{eventType} in repo #{eventPayload.pull_request.html_url}."
 
             retrieveMavenModules(gitHubUrl, sha, statusUrl, (modules) ->
                 retrieveChangedModules(gitHubUrl, prNumber, modules, statusUrl, (modulesToBuild) ->
-                    submitBuildRequest(bambooUrl, eventPayload, modulesToBuild)))
+                    submitBuildRequest(bambooUrl, eventPayload, modulesToBuild, prPlanName)))
 
         catch error
             console.log "[ERROR] Failed to submit PR build!"
