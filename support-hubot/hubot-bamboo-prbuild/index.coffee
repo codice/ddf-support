@@ -12,7 +12,7 @@ queryString = require('querystring')
 actionTypes = ['opened', 'synchronize', 'reopened', 'closed']
 eventTypes = ['pull_request']
 
-prPlanName = "DDFPR-ALL"
+prPlanName = "DDF-PRINC"
 masterPlanName = "DDF-MSTRINC"
 
 bambooUser = process.env.bamboo_user
