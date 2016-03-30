@@ -12,8 +12,8 @@ queryString = require('querystring')
 actionTypes = ['opened', 'synchronize', 'reopened', 'closed']
 eventTypes = ['pull_request']
 
-prPlanName = "DDF-PRINC"
-masterPlanName = "DDF-MSTRINC"
+PR_PLAN_NAME = "DDF-PRINC"
+MASTER_PLAN_NAME = "DDF-MSTRINC"
 
 bambooUser = process.env.bamboo_user
 bambooPassword = process.env.bamboo_pass
@@ -35,10 +35,9 @@ module.exports = (robot) ->
 
     # Determines whether a pr build or master build is needed.
     getPlanName = (eventPayload) ->
-        closed = eventPayload.action is "closed"
-        merged = eventPayload.pull_request.merged
-        if closed and merged then return masterPlanName else return prPlanName
-
+        prClosed = eventPayload.action is "closed"
+        prMerged = eventPayload.pull_request.merged
+        if prClosed and prMerged then return MASTER_PLAN_NAME else return PR_PLAN_NAME
 
     # Removes filename from path.
     removeFileName = (path) ->
@@ -74,6 +73,8 @@ module.exports = (robot) ->
             for module in modules when changedPath.match("^" + module + ".*")
                 if module not in modulesToBuild then modulesToBuild.push(module)
                 break;
+
+        if modulesToBuild.length is 0 then modulesToBuild = ["."]
 
         console.log "[INFO] Modules to build:"
         console.log modulesToBuild
@@ -225,14 +226,14 @@ module.exports = (robot) ->
         gitHubUrl = eventPayload.repository.url
         prNumber = eventPayload.number
         statusUrl = eventPayload.pull_request.statuses_url
-        prPlanName = getPlanName(eventPayload)
+        planName = getPlanName(eventPayload)
 
         try
             console.log "[INFO] Processing #{actionType}/#{eventType} in repo #{eventPayload.pull_request.html_url}."
 
             retrieveMavenModules(gitHubUrl, sha, statusUrl, (modules) ->
                 retrieveChangedModules(gitHubUrl, prNumber, modules, statusUrl, (modulesToBuild) ->
-                    submitBuildRequest(bambooUrl, eventPayload, modulesToBuild, prPlanName)))
+                    submitBuildRequest(bambooUrl, eventPayload, modulesToBuild, planName)))
 
         catch error
             console.log "[ERROR] Failed to submit PR build!"
