@@ -163,7 +163,7 @@ module.exports = (robot) ->
                 # a "resources" directory.
                 modules = (
                     removeFileName(obj.path) for obj in gitTree.tree when obj.path? and
-                        obj.path.match(".*/pom.xml$") and not obj.path.match(".*/resources/.*")
+                        obj.path.match(".*\\bpom.xml$") and not obj.path.match(".*/resources/.*")
                 )
 
                 # Need to reverse sort Maven modules to make sure the most specific modules are
