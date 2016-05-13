@@ -28,6 +28,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>support-maven</module>
         <module>support-checkstyle</module>
         <module>support-jacoco</module>
         <module>support-findbugs</module>
