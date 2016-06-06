@@ -6,8 +6,8 @@ SESSIONNAME="hubot"
 SCRIPTPATH=$( cd $(dirname $0) ; pwd -P )
 tmux has-session -t $SESSIONNAME 2> /dev/null
 
-if [ $? != 0 ]; then
-  FILE="./vars.config"                 # File where hubot environment variables are stored
+if [ $? -ne 0 ]; then
+  FILE="${SCRIPTPATH}/vars.config"     # File where hubot environment variables are stored
   VARS=$(cat $FILE | tr '\n' ' ')      # Capture hubot environment variables
 
   tmux new-session -s $SESSIONNAME -d
