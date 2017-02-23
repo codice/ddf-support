@@ -33,6 +33,7 @@
         <module>support-findbugs</module>
         <module>support-owasp</module>
         <module>support-pmd</module>
+        <module>support-karaf</module>
     </modules>
 
     <properties>
