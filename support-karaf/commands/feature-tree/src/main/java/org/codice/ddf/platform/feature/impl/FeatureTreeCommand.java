@@ -31,7 +31,7 @@ public class FeatureTreeCommand implements Action {
 
     @Option(name = "--include-repo", description = "Include only features coming from the repositories matching this regular expression.", aliases = {
             "-i"})
-    private String repoFilter = ".*(ddf|dib|alliance).*";
+    private String repoFilter = ".*(ddf|alliance).*";
 
     @Option(name = "--line-numbers", description = "Displays line numbers and cross-references", aliases = {
             "-l"})
