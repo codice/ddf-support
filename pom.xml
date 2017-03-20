@@ -22,12 +22,13 @@
     version if you want DDF apps to use latest support-checkstyle version; and update the <version> of the <parent> in child module
     support-checkstyle/pom.xml
     -->
-    <version>2.3.7-SNAPSHOT</version>
+    <version>2.3.8-SNAPSHOT</version>
     <name>DDF Support</name>
     <description>DDF Support module contains support files for builds and site report generation</description>
     <packaging>pom</packaging>
 
     <modules>
+        <module>support-maven</module>
         <module>support-checkstyle</module>
         <module>support-jacoco</module>
         <module>support-findbugs</module>
