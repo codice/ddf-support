@@ -48,13 +48,13 @@ public class MavenVersionValidationPluginTest {
 
     @Test
     public void testValidInputs() {
-        List<String> validInputs = Arrays.asList(
-                "2.3.1",
+        List<String> validInputs = Arrays.asList("2.3.1",
                 "2.3",
                 "2.3-beta2",
                 "bower",
                 "349874875jdakjlfkjadsf#jdfaisdf",
-                "3.5.3jdakjlfkjadsf#jdfaisdf");
+                "3.5.3jdakjlfkjadsf#jdfaisdf",
+                "Eonasdan/bootstrap-datetimepicker#4.17.37");
 
         MavenVersionValidationPlugin mvnPlugin = new MavenVersionValidationPlugin();
         mvnPlugin.setWhitelistedValues(new String[] {"-beta", "#"});
