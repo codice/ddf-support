@@ -41,7 +41,7 @@ import org.codehaus.plexus.util.DirectoryScanner;
 @Mojo(name = "check-package-json")
 public class MavenVersionValidationPlugin extends AbstractMojo {
 
-    @Parameter(property="whitelistedValues")
+    @Parameter(property = "whitelistedValues")
     private String[] whitelistedValues;
 
     @Parameter(defaultValue = "${project}")
@@ -172,8 +172,7 @@ public class MavenVersionValidationPlugin extends AbstractMojo {
      * @return Range character or null (if valid range)
      */
     String scanTokenForRangeSymbol(String token) {
-        for (String whitelistValue : getWhitelistedValues())
-        {
+        for (String whitelistValue : getWhitelistedValues()) {
             if (token.contains(whitelistValue)) {
                 return null;
             }
