@@ -37,6 +37,7 @@ public class MavenVersionValidationPluginTest {
                 "2.3.1 || 4.1.0");
 
         MavenVersionValidationPlugin mvnPlugin = new MavenVersionValidationPlugin();
+        mvnPlugin.setWhitelistedValues(new String[] {"-beta", "#"});
 
         for (String testInputVersion : invalidInputs) {
             assertThat("Assert that each character is properly output as invalid",
@@ -56,6 +57,7 @@ public class MavenVersionValidationPluginTest {
                 "3.5.3jdakjlfkjadsf#jdfaisdf");
 
         MavenVersionValidationPlugin mvnPlugin = new MavenVersionValidationPlugin();
+        mvnPlugin.setWhitelistedValues(new String[] {"-beta", "#"});
 
         for (String testInputVersion : validInputs) {
             assertThat("Assert that good version returns null",

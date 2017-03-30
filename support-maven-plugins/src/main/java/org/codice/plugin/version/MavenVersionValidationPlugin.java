@@ -41,7 +41,10 @@ import org.codehaus.plexus.util.DirectoryScanner;
 @Mojo(name = "check-package-json")
 public class MavenVersionValidationPlugin extends AbstractMojo {
 
-    @Parameter(defaultValue = "${project}", readonly = true, required = true)
+    @Parameter(property="whitelistedValues")
+    private String[] whitelistedValues;
+
+    @Parameter(defaultValue = "${project}")
     MavenProject project;
 
     Set<Character> rangeSymbols = new HashSet(Arrays.asList('>', '=', '|', '-', '<', '^', '~'));
@@ -169,20 +172,31 @@ public class MavenVersionValidationPlugin extends AbstractMojo {
      * @return Range character or null (if valid range)
      */
     String scanTokenForRangeSymbol(String token) {
-        if (token.contains("-beta") || token.contains("#")) {
-            return null;
+        for (String whitelistValue : getWhitelistedValues())
+        {
+            if (token.contains(whitelistValue)) {
+                return null;
+            }
         }
 
         if (!token.matches(".*\\d+[.]\\d+.*")) {
             return null;
         }
 
-        for (char character: token.toCharArray()) {
+        for (char character : token.toCharArray()) {
             if (rangeSymbols.contains(character)) {
                 return String.valueOf(character);
             }
         }
 
         return null;
+    }
+
+    public String[] getWhitelistedValues() {
+        return whitelistedValues;
+    }
+
+    public void setWhitelistedValues(String[] whitelistedValues) {
+        this.whitelistedValues = whitelistedValues;
     }
 }
