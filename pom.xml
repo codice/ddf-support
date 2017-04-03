@@ -29,6 +29,9 @@
     <packaging>pom</packaging>
 
     <modules>
+        <!-- Make sure to list support-githooks first then gitsetup since gitsetup has a dependency on it -->
+        <module>support-githooks</module>
+        <module>gitsetup</module>
         <module>support-checkstyle</module>
         <module>support-jacoco</module>
         <module>support-findbugs</module>
@@ -50,6 +53,7 @@
         <maven.deploy.plugin.version>2.6</maven.deploy.plugin.version>
         <maven.install.plugin.version>2.3.1</maven.install.plugin.version>
         <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
+	<maven.jacoco.plugin.version>0.7.9</maven.jacoco.plugin.version>
     </properties>
 
     <scm>
