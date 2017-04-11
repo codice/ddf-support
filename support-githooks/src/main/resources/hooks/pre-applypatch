@@ -1,0 +1,62 @@
+#!/bin/bash
+#
+# Copyright (c) Codice Foundation
+# <p/>
+# This is free software: you can redistribute it and/or modify it under the terms of the GNU Lesser
+# General Public License as published by the Free Software Foundation, either version 3 of the
+# License, or any later version.
+# <p/>
+# This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+# even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# Lesser General Public License for more details. A copy of the GNU Lesser General Public License
+# is distributed along with this program and can be found at
+# <http://www.gnu.org/licenses/lgpl.html>.
+#
+# Git pre-applypatch hook to find all dirty words in the modifications
+#
+# Note: all @{...} will be expanded automatically at install time
+#
+JAVA_CMD=java
+if [ -d "$JAVA_HOME" ]; then
+	JAVA_CMD="$JAVA_HOME/bin/java"
+fi
+#JAVA_OPTS=-Djava.util.logging.config.file=logging.properties
+
+# rebase runs on a (no branch)
+BRANCH_NAME=$(git branch | grep '*' | sed 's/* //')
+# we don't want to run the hooks during a rebase,
+# because they already ran during commit, and there's
+# no way to turn them off during a rebase
+if [[ "$BRANCH_NAME" != *"no branch"* ]]; then
+    CPFILE="@{BASEDIR}/classpath.txt"
+    # only force re-generation if the cached file is not there or if it is older than 24 hours
+    if [ ! -f "$CPFILE" -o -z "$(find "$CPFILE" -mtime 1 2>/dev/null)" ]; then
+        TMPFILE=$(mktemp -q /tmp/$(basename $0).cp.XXXXXX)
+        rc=$?
+        if [ $rc -eq 0 ]; then
+            # retreive classpath using the pom's dependencies
+            if [ -n "@{SETTINGS}" ]; then
+                mvn -s "@{SETTINGS}" -f "@{POMPATH}" -quiet org.apache.maven.plugins:maven-dependency-plugin:3.0.0:build-classpath -DincludeScope=runtime -Dmdep.outputFile="$TMPFILE"
+            else
+                mvn -f "@{POMPATH}" -quiet org.apache.maven.plugins:maven-dependency-plugin:3.0.0:build-classpath -DincludeScope=runtime -Dmdep.outputFile="$TMPFILE"
+            fi
+            rc=$?
+            if [ $rc -eq 0 ]; then
+                # save classpath to classpath.txt file
+                mv -f "$TMPFILE" "$CPFILE"
+                rc=$?
+            fi
+        fi
+        if [ ! -f "$CPFILE" ]; then
+            echo "$0: failed to cache classpath for hooks; make sure you have access to nexus and retry: rc=$rc" >&2
+            exit 1
+        fi
+    fi
+    CP=$(cat $CPFILE)
+    rc=$?
+    if [ $rc -ne 0 ]; then
+        echo "$0: failed to read classpath file $CPFILE: rc=$rc" >&2
+        exit 1
+    fi
+    "$JAVA_CMD" $JAVA_OPTS -cp "$CP" org.codice.git.hook.Hook "@{BASEDIR}" "@{SETTINGS}" org.codice.git.hook.PreCommit $@
+fi
