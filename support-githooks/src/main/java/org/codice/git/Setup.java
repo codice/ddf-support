@@ -40,6 +40,8 @@ public class Setup {
      */
     public static final int ERROR_CODE = 1;
 
+    public static int SONAR_FINDING = -1;
+
     private static Logger LOGGER = Logger.getLogger(Setup.class.getName());
 
     // Configure the logging for this test
