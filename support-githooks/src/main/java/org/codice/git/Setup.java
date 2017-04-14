@@ -38,7 +38,7 @@ public class Setup {
      * Use a positive number here for the error code - the git bash shell doesn't recognize
      * negative numbers - when those are returned it sees them as a zero.
      */
-    public static int ERROR_CODE = 1;
+    public static final int ERROR_CODE = 1;
 
     private static Logger LOGGER = Logger.getLogger(Setup.class.getName());
 
