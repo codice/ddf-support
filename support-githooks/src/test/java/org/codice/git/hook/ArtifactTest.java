@@ -127,22 +127,6 @@ public class ArtifactTest {
     }
 
     @Test
-    public void testReadInfoIfNotReadable() throws Exception {
-        // marking a file not readable doesn't work on windows
-        assumeFalse(SystemUtils.IS_OS_WINDOWS);
-        GitIntegrationTest.writeToFile(aifile, "a,b");
-        aifile.setReadable(false);
-
-        assertNull(a.getMavenInfo());
-        assertNull(a.getMavenName());
-
-        a.readInfo();
-
-        assertNull(a.getMavenInfo());
-        assertNull(a.getMavenName());
-    }
-
-    @Test
     public void testWriteInfo() throws Exception {
         a.mvnInfo = "a";
         a.mvnName = "b";
