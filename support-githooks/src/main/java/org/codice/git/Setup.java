@@ -15,7 +15,10 @@ package org.codice.git;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.logging.Level;
@@ -40,7 +43,7 @@ public class Setup {
      */
     public static final int ERROR_CODE = 1;
 
-    private static int SONAR_FINDING = -1;
+    public static int SONAR_FINDING = -1;
 
     private static Logger LOGGER = Logger.getLogger(Setup.class.getName());
 
@@ -98,6 +101,7 @@ public class Setup {
 
     private static void validateAndUpdateGitConfig(RepositoryHandler handler) throws IOException {
         final String autocrlf = handler.getConfigString("core", null, "autocrlf");
+        InputStream unclosedStream = new FileInputStream("/tmp");
 
         if (StringUtils.isEmpty(autocrlf)) {
             final String value = SystemUtils.IS_OS_WINDOWS ? "true" : "input";
