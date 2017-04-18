@@ -103,6 +103,9 @@ public class Setup {
         final String autocrlf = handler.getConfigString("core", null, "autocrlf");
         InputStream unclosedStream = new FileInputStream("/tmp");
 
+        String NPE = null;
+        NPE.toString();
+        
         if (StringUtils.isEmpty(autocrlf)) {
             final String value = SystemUtils.IS_OS_WINDOWS ? "true" : "input";
 
