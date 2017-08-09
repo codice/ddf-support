@@ -13,31 +13,44 @@
  **/
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-
     <parent>
+        <artifactId>support-maven-plugins</artifactId>
         <groupId>ddf.support</groupId>
-        <artifactId>support-pom</artifactId>
         <version>2.3.9-SNAPSHOT</version>
     </parent>
 
-    <artifactId>support-maven-plugins</artifactId>
-    <name>DDF Support Maven Plugins</name>
-    <packaging>pom</packaging>
+    <modelVersion>4.0.0</modelVersion>
 
-    <modules>
-        <module>support-github-dependency-maven-plugin</module>
-        <module>support-version-validation-maven-plugin</module>
-    </modules>
+    <artifactId>github-dependency-maven-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+
+    <name>DDF Support GitHub Dependency Check</name>
+    <description>Checks the existence of GitHub dependencies in yarn files.</description>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-plugin-plugin</artifactId>
-                <version>3.3</version>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
             </plugin>
         </plugins>
     </build>
-</project>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.maven.surefire</groupId>
+            <artifactId>maven-surefire-common</artifactId>
+            <version>2.12.4</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
