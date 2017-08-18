@@ -23,7 +23,8 @@ public class ConfigureLogging {
     public ConfigureLogging() {
         // Configure the java logging
         InputStream is = null;
-
+        
+        System.out.println("This is a test");
         try {
             is = ConfigureLogging.class.getResourceAsStream("/logging.properties");
             if (is != null) {
