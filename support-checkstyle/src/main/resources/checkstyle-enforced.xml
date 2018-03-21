@@ -79,16 +79,6 @@
 		</module>
 
 
-		<!-- Checks for imports                              -->
-		<!-- See http://checkstyle.sf.net/config_import.html -->
-		<module name="AvoidStarImport"/>
-		<module name="IllegalImport"/> <!-- defaults to sun.* packages -->
-		<module name="RedundantImport"/>
-
-
-        <module name="UnusedImports"/>
-
-
 		<!-- Checks for Size Violations.                    -->
 		<!-- See http://checkstyle.sf.net/config_sizes.html -->
         <module name="AnonInnerLength">
@@ -111,10 +101,6 @@
 			<property name="max" value="7"/>
 			<property name="tokens" value="METHOD_DEF"/>
 		</module>
-
-		<!-- Modifier Checks                                    -->
-		<!-- See http://checkstyle.sf.net/config_modifier.html -->
-		<module name="ModifierOrder"/>
 
 		<module name="RedundantModifier">
 			<property name="severity" value="ignore"/>
