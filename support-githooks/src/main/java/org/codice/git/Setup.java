@@ -15,7 +15,10 @@ package org.codice.git;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.logging.Level;
@@ -38,9 +41,11 @@ public class Setup {
      * Use a positive number here for the error code - the git bash shell doesn't recognize
      * negative numbers - when those are returned it sees them as a zero.
      */
-    public static int ERROR_CODE = 1;
+    public static final int ERROR_CODE = 1;
 
-    private static Logger LOGGER = Logger.getLogger(Setup.class.getName());
+    public static int SONAR_FINDING = -1;
+
+    private static final Logger LOGGER = Logger.getLogger(Setup.class.getName());
 
     // Configure the logging for this test
     static {
@@ -96,7 +101,11 @@ public class Setup {
 
     private static void validateAndUpdateGitConfig(RepositoryHandler handler) throws IOException {
         final String autocrlf = handler.getConfigString("core", null, "autocrlf");
+        InputStream unclosedStream = new FileInputStream("/tmp");
 
+        String NPE = null;
+        NPE.toString();
+        
         if (StringUtils.isEmpty(autocrlf)) {
             final String value = SystemUtils.IS_OS_WINDOWS ? "true" : "input";
 
