@@ -39,6 +39,7 @@
         <module>support-pmd</module>
         <module>support-karaf</module>
         <module>support-maven-plugins</module>
+        <module>spock-shaded</module>
     </modules>
 
     <properties>
@@ -53,7 +54,11 @@
         <maven.deploy.plugin.version>2.6</maven.deploy.plugin.version>
         <maven.install.plugin.version>2.3.1</maven.install.plugin.version>
         <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
-	<maven.jacoco.plugin.version>0.7.9</maven.jacoco.plugin.version>
+	    <maven.jacoco.plugin.version>0.7.9</maven.jacoco.plugin.version>
+
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+
     </properties>
 
     <scm>
