@@ -42,8 +42,8 @@
 
 	<module name="TreeWalker">
 
-		<!-- Checks for Javadoc comments.                     -->
-		<!-- See http://checkstyle.sf.net/config_javadoc.html -->
+		<!-- Checks for Javadoc comments.                              -->
+		<!-- See http://checkstyle.sourceforge.net/config_javadoc.html -->
 		<module name="JavadocMethod">
 			<property name="severity" value="ignore"/>
 		</module>
@@ -59,8 +59,8 @@
 
 
 
-		<!-- Checks for Naming Conventions.                  -->
-		<!-- See http://checkstyle.sf.net/config_naming.html -->
+		<!-- Checks for Naming Conventions.                           -->
+		<!-- See http://checkstyle.sourceforge.net/config_naming.html -->
 
         <module name="ConstantName"/>
 		<module name="LocalFinalVariableName">
@@ -78,9 +78,13 @@
 			<property name="severity" value="warning"/>
 		</module>
 
-
-		<!-- Checks for Size Violations.                    -->
-		<!-- See http://checkstyle.sf.net/config_sizes.html -->
+                <!-- Checks for imports                                        -->
+                <!-- See http://checkstyle.sourceforge.net/config_imports.html -->
+                <module name="AvoidStarImport"/>
+                <module name="IllegalImport"/>
+                
+		<!-- Checks for Size Violations.                             -->
+		<!-- See http://checkstyle.sourceforge.net/config_sizes.html -->
         <module name="AnonInnerLength">
             <property name="max" value="40"/>
             <property name="severity" value="ignore"/>
@@ -106,8 +110,8 @@
 			<property name="severity" value="ignore"/>
 		</module>
 
-		<!-- Checks for common coding problems               -->
-		<!-- See http://checkstyle.sf.net/config_coding.html -->
+		<!-- Checks for common coding problems                        -->
+		<!-- See http://checkstyle.sourceforge.net/config_coding.html -->
 		<module name="ArrayTrailingComma">
 			<property name="severity" value="ignore"/>
 		</module>
@@ -195,8 +199,8 @@
 			<property name="severity" value="ignore"/>
 		</module>
 
-		<!-- Checks for class design                         -->
-		<!-- See http://checkstyle.sf.net/config_design.html -->
+		<!-- Checks for class design                                  -->
+		<!-- See http://checkstyle.sourceforge.net/config_design.html -->
 
 		<module name="FinalClass">
 			<property name="severity" value="ignore"/>
@@ -228,8 +232,8 @@
 
 
 
-		<!-- Metrics checks.                   -->
-		<!-- See http://checkstyle.sf.net/config_metrics.html -->
+		<!-- Metrics checks.                                           -->
+		<!-- See http://checkstyle.sourceforge.net/config_metrics.html -->
 		<module name="BooleanExpressionComplexity">
 			<property name="max" value="6"/>
 		</module>
@@ -252,8 +256,8 @@
 		</module>
 
 
-		<!-- Miscellaneous other checks.                   -->
-		<!-- See http://checkstyle.sf.net/config_misc.html -->
+		<!-- Miscellaneous other checks.                            -->
+		<!-- See http://checkstyle.sourceforge.net/config_misc.html -->
 		<module name="ArrayTypeStyle">
 			<property name="severity" value="ignore"/>
 		</module>
