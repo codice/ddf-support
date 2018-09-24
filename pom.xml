@@ -38,10 +38,12 @@
         <module>support-owasp</module>
         <module>support-pmd</module>
         <module>support-karaf</module>
-        <module>support-maven-plugins</module>
+        <module>support-maven</module>
     </modules>
 
     <properties>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <maven.assembly.plugin.version>2.2.2</maven.assembly.plugin.version>
         <maven.clean.plugin.version>2.4.1</maven.clean.plugin.version>
         <maven.resources.plugin.version>2.5</maven.resources.plugin.version>
