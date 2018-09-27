@@ -12,7 +12,9 @@
  *
  **/
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ddf.support</groupId>
@@ -29,11 +31,11 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>support-jacoco</module>
         <!-- Make sure to list support-githooks first then gitsetup since gitsetup has a dependency on it -->
         <module>support-githooks</module>
         <module>gitsetup</module>
         <module>support-checkstyle</module>
+        <module>support-jacoco</module>
         <module>support-findbugs</module>
         <module>support-owasp</module>
         <module>support-pmd</module>
@@ -44,6 +46,9 @@
     <properties>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+
+        <codice-maven.version>0.1</codice-maven.version>
+
         <maven.assembly.plugin.version>2.2.2</maven.assembly.plugin.version>
         <maven.clean.plugin.version>2.4.1</maven.clean.plugin.version>
         <maven.resources.plugin.version>2.5</maven.resources.plugin.version>
@@ -84,15 +89,16 @@
                     <artifactId>maven-deploy-plugin</artifactId>
                     <version>${maven.deploy.plugin.version}</version>
                 </plugin>
+
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>${maven.jacoco.plugin.version}</version>
                     <dependencies>
                         <dependency>
-                            <groupId>ddf.support</groupId>
-                            <artifactId>support-jacoco</artifactId>
-                            <version>${project.version}</version>
+                            <groupId>org.codice.maven</groupId>
+                            <artifactId>jacoco</artifactId>
+                            <version>${codice-maven.version}</version>
                         </dependency>
                     </dependencies>
                     <executions>
@@ -104,6 +110,7 @@
                         </execution>
                     </executions>
                 </plugin>
+
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
@@ -160,9 +167,34 @@
 
     <repositories>
         <repository>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
             <id>codice</id>
             <name>Codice Repository</name>
-            <url>http://artifacts.codice.org/content/groups/public/</url>
+            <url>https://artifacts.codice.org/content/groups/public/</url>
         </repository>
     </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>central</id>
+            <name>Central Repository</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <layout>default</layout>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>codice</id>
+            <name>Codice Repository</name>
+            <url>https://artifacts.codice.org/content/groups/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
