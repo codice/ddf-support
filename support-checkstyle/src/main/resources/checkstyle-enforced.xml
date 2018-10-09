@@ -16,13 +16,13 @@
 
 
 <module name="Checker">
+	<!--Excludes module-info.java files from checks-->
+	<module name="BeforeExecutionExclusionFileFilter">
+		<property name="fileNamePattern" value="module\-info\.java$"/>
+	</module>
+
 	<!-- Supports @SuppressWarnings() annotations -->
 	<module name="SuppressWarningsFilter"/>
-	<!-- Supports one line suppression such as // suppress checkstyle:IllegalImport special package required -->
-	<module name="SuppressWithNearbyCommentFilter">
-		<property name="commentFormat" value="suppress checkstyle:(\w+(\|\w+)*)"/>
-		<property name="checkFormat" value="$1"/>
-	</module>
 
     <!--XML Header checks -->
     <module name="RegexpHeader">
@@ -48,10 +48,14 @@
 	</module>
 
 	<module name="TreeWalker">
+		<!-- Supports one line suppression such as // suppress checkstyle:IllegalImport special package required -->
+		<module name="SuppressWithNearbyCommentFilter">
+			<property name="commentFormat" value="suppress checkstyle:(\w+(\|\w+)*)"/>
+			<property name="checkFormat" value="$1"/>
+		</module>
+
 		<!-- Supports @SuppressWarnings() annotations -->
 		<module name="SuppressWarningsHolder" />
-		<!-- Supports inline suppression comments -->
-		<module name="FileContentsHolder"/>
 
 		<!-- Checks for Javadoc comments.                              -->
 		<!-- See http://checkstyle.sourceforge.net/config_javadoc.html -->
