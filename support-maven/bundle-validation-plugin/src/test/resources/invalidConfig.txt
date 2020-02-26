@@ -1,0 +1,11 @@
+<configuration>
+    <instructions>
+        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+        <Import-Package>
+            package1,
+            package2;version="[1.0,3)",
+            !package3,
+            *
+        </Import-Package>
+    </instructions>
+</configuration>
