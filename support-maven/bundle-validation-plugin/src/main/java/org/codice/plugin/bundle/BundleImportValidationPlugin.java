@@ -150,15 +150,14 @@ public class BundleImportValidationPlugin extends AbstractMojo {
           .collect(Collectors.toList());
     }
 
-    if (CONFIG_OPTION_TO_VALIDATE.equals(current.getName())) {
-      List<ValidationResult> results = validateImports(current.getValue());
-      if (results.isEmpty()) {
-        return Collections.singletonList(new ValidationResult("No Packages Imported", true));
-      }
-      return results;
-    } else {
+    if (!CONFIG_OPTION_TO_VALIDATE.equals(current.getName())) {
       return Collections.emptyList();
     }
+    List<ValidationResult> results = validateImports(current.getValue());
+    if (results.isEmpty()) {
+      return Collections.singletonList(new ValidationResult("No Packages Imported", true));
+    }
+    return results;
   }
 
   private List<ValidationResult> validateImports(String importString) {
@@ -185,15 +184,15 @@ public class BundleImportValidationPlugin extends AbstractMojo {
     getLog().info("Testing import: " + line);
 
     ValidationResult validationResult = new ValidationResult(line, IS_VALID_IMPORT.test(line));
-
-    if (!validationResult.isValid()) {
-      if (warnOnlyModules.contains(project.getArtifactId()) || warnOnlyModules.contains("*")) {
-        getLog().warn("Import with missing version found: " + line);
-      } else {
-        getLog().error("Import with missing version found: " + line);
-      }
+    if (validationResult.isValid()) {
+      return validationResult;
     }
 
+    if (warnOnlyModules.contains(project.getArtifactId()) || warnOnlyModules.contains("*")) {
+      getLog().warn("Import with missing version found: " + line);
+    } else {
+      getLog().error("Import with missing version found: " + line);
+    }
     return validationResult;
   }
 
@@ -212,10 +211,11 @@ public class BundleImportValidationPlugin extends AbstractMojo {
 
     if (validationResults.isEmpty()) {
       validationResultSummary.append("Invalid  -  ").append(NO_PACKAGE_IMPORTS_FOUND).append("\n");
-    } else {
-      for (ValidationResult result : validationResults) {
-        validationResultSummary.append(result).append("\n");
-      }
+      return validationResultSummary;
+    }
+
+    for (ValidationResult result : validationResults) {
+      validationResultSummary.append(result).append("\n");
     }
     return validationResultSummary;
   }
