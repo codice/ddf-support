@@ -102,7 +102,7 @@ public class BundleImportValidationPluginTest {
     validationPlugin.execute();
 
     List<ValidationResult> results = validationPlugin.validateConfiguredImports(buildPlugin);
-    assertThat(results.size(), is(2));
+    assertThat(results.size(), is(4));
   }
 
   @Test

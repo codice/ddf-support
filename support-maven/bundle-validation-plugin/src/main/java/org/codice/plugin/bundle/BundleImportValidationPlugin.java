@@ -37,7 +37,7 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 
 @Mojo(
     name = "validate-import-versions",
-    defaultPhase = LifecyclePhase.INITIALIZE,
+    defaultPhase = LifecyclePhase.VALIDATE,
     threadSafe = true)
 public class BundleImportValidationPlugin extends AbstractMojo {
 
@@ -55,7 +55,8 @@ public class BundleImportValidationPlugin extends AbstractMojo {
   private static final String NO_PACKAGE_IMPORTS_FOUND =
       "No package imports specified; this defaults to a * import";
 
-  private static final Pattern IMPORT_VALUE_PATTERN = Pattern.compile("[^,\"]*\"[^\"]*\"|[^,]+");
+  private static final Pattern IMPORT_VALUE_PATTERN =
+      Pattern.compile("(?:[^,\\\"]+|(?:\\\"[^\\\"]*\\\"))+|[^,]+");
 
   @Parameter(defaultValue = "${project}", readonly = true, required = true)
   private MavenProject project;
