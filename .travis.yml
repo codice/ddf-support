@@ -1,5 +1,5 @@
 install: mvn install --quiet -DskipTests=true -B
 language: java
 jdk:
-  - oraclejdk8
+  - openjdk8
 

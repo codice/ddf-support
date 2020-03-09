@@ -27,6 +27,7 @@
     <modules>
         <module>version-validation-plugin</module>
         <module>artifact-size-enforcer</module>
+        <module>bundle-validation-plugin</module>
     </modules>
     
 </project>
