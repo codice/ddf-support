@@ -22,7 +22,7 @@
     version if you want DDF apps to use latest support-checkstyle version; and update the <version> of the <parent> in child module
     support-checkstyle/pom.xml
     -->
-    <version>2.3.17-SNAPSHOT</version>
+    <version>2.3.17</version>
     <name>DDF Support</name>
     <description>DDF Support module contains support files for builds and site report generation
     </description>
@@ -65,7 +65,7 @@
         <url>https://github.com/codice/ddf-support.git</url>
         <connection>scm:git:git://github.com/codice/ddf-support.git</connection>
         <developerConnection>scm:git:git://github.com/codice/ddf-support.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>support-pom-2.3.17</tag>
     </scm>
 
     <distributionManagement>
