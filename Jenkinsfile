@@ -20,7 +20,7 @@ pipeline {
           Note: The BRANCH_NAME will only work with a multi-branch job using the github-branch-source
         */
         cron(BRANCH_NAME == "master" ? "@weekly" : "")
-		polSCM("H/10 * * * *")
+		pollSCM("H/10 * * * *")
     }
     environment {
         DOCS = 'distribution/docs'
