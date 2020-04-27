@@ -51,11 +51,11 @@
         <maven.clean.plugin.version>2.4.1</maven.clean.plugin.version>
         <maven.resources.plugin.version>2.5</maven.resources.plugin.version>
         <maven.javadoc.plugin.version>2.7</maven.javadoc.plugin.version>
-        <maven.release.plugin.version>2.5.1</maven.release.plugin.version>
+        <maven.release.plugin.version>3.0.0-M1</maven.release.plugin.version>
         <maven.site.plugin.version>3.4</maven.site.plugin.version>
         <maven.dependency.plugin.version>2.4</maven.dependency.plugin.version>
         <maven.compiler.plugin.version>2.3.2</maven.compiler.plugin.version>
-        <maven.deploy.plugin.version>2.6</maven.deploy.plugin.version>
+        <maven.deploy.plugin.version>3.0.0-M1</maven.deploy.plugin.version>
         <maven.install.plugin.version>2.3.1</maven.install.plugin.version>
         <maven.surefire.plugin.version>2.18.1</maven.surefire.plugin.version>
         <maven.jacoco.plugin.version>0.8.1</maven.jacoco.plugin.version>
