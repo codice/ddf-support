@@ -23,12 +23,8 @@ pipeline {
 		pollSCM("H/10 * * * *")
     }
     environment {
-        DOCS = 'distribution/docs'
-        ITESTS = 'distribution/test/itests/test-itests-ddf'
         LARGE_MVN_OPTS = '-Xmx8192M -Xss128M -XX:+CMSClassUnloadingEnabled -XX:+UseConcMarkSweepGC '
-        DISABLE_DOWNLOAD_PROGRESS_OPTS = '-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn '
         LINUX_MVN_RANDOM = '-Djava.security.egd=file:/dev/./urandom'
-        COVERAGE_EXCLUSIONS = '**/test/**/*,**/itests/**/*,**/*Test*,**/sdk/**/*,**/*.js,**/node_modules/**/*,**/jaxb/**/*,**/wsdl/**/*,**/nces/sws/**/*,**/*.adoc,**/*.txt,**/*.xml'
         GITHUB_USERNAME = 'codice'
         GITHUB_TOKEN = credentials('github-api-cred')
         GITHUB_REPONAME = 'ddf-support'
@@ -51,7 +47,7 @@ pipeline {
             }
         }
 
-        stage('Full Build Except Itests') {
+        stage('Full Build') {
             when {
                 expression { env.CHANGE_ID == null } 
             }
@@ -59,14 +55,14 @@ pipeline {
                 timeout(time: 3, unit: 'HOURS')
             }
             steps {
-                withMaven(maven: 'maven-latest', globalMavenSettingsConfig: 'default-global-settings', mavenSettingsConfig: 'phxSettings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
-                    sh 'mvn clean install -B -DskipITs -pl !$ITESTS $DISABLE_DOWNLOAD_PROGRESS_OPTS'
+                withMaven(maven: 'maven-latest', mavenSettingsConfig: 'feca3f61-1da1-4887-a9ad-dd4a41fd4423', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
+                    sh 'mvn clean install -B -DskipITs'
                 }
             }
         }
 
         /*
-          Deploy stage will only be executed for deployable branches. These include master and any patch branch matching M.m.x format (i.e. 2.10.x, 2.9.x, etc...).
+          Deploy stage will only be executed for deployable branches. 
           It will also only deploy in the presence of an environment variable JENKINS_ENV = 'prod'. This can be passed in globally from the jenkins master node settings.
         */
         stage('Deploy') {
@@ -78,8 +74,8 @@ pipeline {
                 }
             }
             steps{
-                withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'phxOfficeGlobalSettings', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LINUX_MVN_RANDOM}') {
-                    sh 'mvn deploy -nsu -DskipTests=true -Dpmd.skip=true -Dfindbugs.skip=true -Dcheckstyle.skip=true -DretryFailedDeploymentCount=10 $DISABLE_DOWNLOAD_PROGRESS_OPTS'
+                withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: '51e52749-c47a-4e11-9c58-0adf485626f5', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LINUX_MVN_RANDOM}') {
+                    sh 'mvn deploy -nsu -DskipTests=true -Dpmd.skip=true -Dfindbugs.skip=true -Dcheckstyle.skip=true'
                 }
             }
         }
@@ -94,9 +90,8 @@ pipeline {
                 SONAR_TOKEN = credentials('sonarqube-token')
             }
             steps {
-                withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: 'phxOfficeGlobalSettings', mavenSettingsConfig: 'phxSettings', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
-                            sh 'mvn clean -q -B -DskipTests=true -Dfindbugs.skip=true -Dcheckstyle.skip=true org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN  -Dsonar.organization=codice -Dsonar.projectKey=ddf-support:master -Dsonar.organization=codice -Dsonar.exclusions=${COVERAGE_EXCLUSIONS} -pl !$DOCS,!$ITESTS $DISABLE_DOWNLOAD_PROGRESS_OPTS'
-
+                withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: '51e52749-c47a-4e11-9c58-0adf485626f5', mavenSettingsConfig: 'feca3f61-1da1-4887-a9ad-dd4a41fd4423', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
+                            sh 'mvn clean -q -B -DskipTests=true -Dfindbugs.skip=true -Dcheckstyle.skip=true org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN  -Dsonar.organization=codice -Dsonar.projectKey=ddf-support:master -Dsonar.organization=codice'
                 }
             }
         }
