@@ -51,8 +51,9 @@ pipeline {
             when {
                 expression { env.CHANGE_ID == null } 
             }
+
             options {
-                timeout(time: 3, unit: 'HOURS')
+                timeout(time: 1, unit: 'HOURS')
             }
             steps {
                 withMaven(maven: 'maven-latest', mavenSettingsConfig: 'feca3f61-1da1-4887-a9ad-dd4a41fd4423', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
@@ -73,6 +74,9 @@ pipeline {
                     environment name: 'JENKINS_ENV', value: 'prod'
                 }
             }
+            options {
+                timeout(time: 1, unit: 'HOURS')
+            }
             steps{
                 withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: '51e52749-c47a-4e11-9c58-0adf485626f5', mavenSettingsConfig: 'codice-maven-settings', mavenOpts: '${LINUX_MVN_RANDOM}') {
                     sh 'mvn deploy -nsu -DskipTests=true -Dpmd.skip=true -Dfindbugs.skip=true -Dcheckstyle.skip=true'
@@ -88,6 +92,9 @@ pipeline {
             environment {
                 SONARQUBE_GITHUB_TOKEN = credentials('SonarQubeGithubToken')
                 SONAR_TOKEN = credentials('sonarqube-token')
+            }
+            options {
+                timeout(time: 1, unit: 'HOURS')
             }
             steps {
                 withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: '51e52749-c47a-4e11-9c58-0adf485626f5', mavenSettingsConfig: 'feca3f61-1da1-4887-a9ad-dd4a41fd4423', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
