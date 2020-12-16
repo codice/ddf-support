@@ -97,7 +97,7 @@ pipeline {
                 timeout(time: 1, unit: 'HOURS')
             }
             steps {
-                withMaven(maven: 'maven-latest', jdk: 'jdk8-latest', globalMavenSettingsConfig: '51e52749-c47a-4e11-9c58-0adf485626f5', mavenSettingsConfig: 'feca3f61-1da1-4887-a9ad-dd4a41fd4423', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
+                withMaven(maven: 'maven-latest', jdk: 'jdk11', globalMavenSettingsConfig: '51e52749-c47a-4e11-9c58-0adf485626f5', mavenSettingsConfig: 'feca3f61-1da1-4887-a9ad-dd4a41fd4423', mavenOpts: '${LARGE_MVN_OPTS} ${LINUX_MVN_RANDOM}') {
                             sh 'mvn clean -q -B -DskipTests=true -Dfindbugs.skip=true -Dcheckstyle.skip=true org.jacoco:jacoco-maven-plugin:prepare-agent package sonar:sonar -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN  -Dsonar.organization=codice -Dsonar.projectKey=ddf-support:master -Dsonar.organization=codice'
                 }
             }
