@@ -28,7 +28,7 @@
     <description>DDF Git Hooks</description>
 
     <properties>
-        <jgit.version>3.2.0.201312181205-r</jgit.version>
+        <jgit.version>3.5.3.201412180710-r</jgit.version>
         <guava.version>18.0</guava.version>
         <commons-lang3.version>3.4</commons-lang3.version>
         <commons-io.version>2.5</commons-io.version>
